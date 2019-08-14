@@ -14,20 +14,20 @@ services:
     ports:
       - 80:80     # Http
       - 443:443   # Https
+    expose:
+      - 8080
     env_file:
-      - ovh-api-secret.env
+      - /mnt/DATA/DOCKER/01_traefik/ovh-api-secret.env
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-net
-      - traefik.protocol=https
+      - traefik.protocol=http
       - traefik.port=8080
       - traefik.backend=traefik
       - traefik.frontend.rule=Host:traefik.clfp.fr
-      - traefik.frontend.headers.STSSeconds=315360000
-      - traefik.frontend.headers.STSPreload=true
-      - traefik.frontend.auth.basic=admin:$$apr1$$qHhf.Q.e$$uTBfawp3takoGjAvQiBBS1 #Password
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock  # Listen to docker events (unix sock)
-      - /mnt/ETC/DOCKER/container_files/04_traefik/:/etc/traefik/
+      - /mnt/DATA/DOCKER/01_traefik/traefik.toml:/traefik.toml
+      - /mnt/DATA/DOCKER/01_traefik/acme:/acme
     networks:
       - traefik-net
