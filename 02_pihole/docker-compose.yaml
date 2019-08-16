@@ -13,10 +13,13 @@ services:
       - 53:53/tcp
       - 53:53/udp
       - 67:67/udp
-    expose:
-      - 80
+      - 8082:80
     environment:
       - TZ=Europe/Paris
+      - VIRTUAL_HOST=pihole.clfp.fr
+#/!\ on local, access using host_ip:8082/admin/. add /admin/
+      - DNS1=9.9.9.9
+      - DNS2=1.1.1.1
     env_file:
       - pihole-password.env
     labels:
