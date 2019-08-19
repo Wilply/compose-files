@@ -7,17 +7,14 @@ networks:
     internal: true
 
 services:
-
-  nextcloud:
-    image: linuxserver/nextcloud
-    container_name: nextcloud
+  nextcloud-nginx:
+    image: nginx:alpine
+    container_name: nextcloud-nginx
     restart: always
     expose:
       - 80
     environment:
       - TZ=Europe/Paris
-      - PGID=1500
-      - PUID=1500
     labels:
       - traefik.enable=true
       - traefik.docker.network=traefik-net
@@ -30,18 +27,36 @@ services:
       - traefik.frontend.headers.STSIncludeSubdomains=true
       - traefik.frontend.headers.STSPreload=true
     volumes:
-      - /mnt/DATA/DOCKER/03_nextcloud/nextcloud/config:/config
-      - /mnt/DATA/DOCKER/03_nextcloud/nextcloud/data:/data
+      - /mnt/DATA/DOCKER/03_nextcloud/nextcloud/:/var/www/html/:ro
+    depends_on:
+      - nextcloud_database
+      - nextcloud-fpm
+    networks:
+      - traefik-net
+      - stack-net
+
+  nextcloud-fpm:
+    image: nextcloud:fpm-alpine
+    container_name: nextcloud-fpm
+    restart: always
+    expose:
+      - 80
+    environment:
+      - TZ=Europe/Paris
+    user: 1500:1500
+    labels:
+      - traefik.enable=false
+    volumes:
+      - /mnt/DATA/DOCKER/03_nextcloud/nextcloud/:/var/www/html/
       - /mnt/DATA/USERS:/raid_storage/USERS
       - /mnt/DATA/MEDIA:/raid_storage/MEDIA
     depends_on:
       - nextcloud_database
     networks:
-      - traefik-net
       - stack-net
 
   nextcloud_database:
-    image: postgres
+    image: postgres:alpine
     container_name: nextcloud_database
     restart: always
     expose:
