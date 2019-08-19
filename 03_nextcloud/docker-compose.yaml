@@ -30,7 +30,7 @@ services:
       - /mnt/DATA/DOCKER/03_nextcloud/nextcloud:/var/www/html:ro
       - /mnt/DATA/DOCKER/03_nextcloud/nginx/nginx.conf:/etc/nginx/nginx.conf
     depends_on:
-      - nextcloud_database
+      - nextcloud-database
       - nextcloud-fpm
     networks:
       - traefik-net
@@ -52,7 +52,7 @@ services:
       - /mnt/DATA/USERS:/raid_storage/USERS
       - /mnt/DATA/MEDIA:/raid_storage/MEDIA
     depends_on:
-      - nextcloud_database
+      - nextcloud-database
     networks:
       - stack-net
 
