@@ -1,0 +1,58 @@
+version: '3'
+
+networks:
+  traefik-net:
+    external: true
+  stack-net:
+    internal: true
+
+services:
+
+  nextcloud:
+    image: linuxserver/nextcloud
+    container_name: nextcloud
+    restart: always
+    expose:
+      - 80
+    environment:
+      - TZ=Europe/Paris
+      - PGID=1500
+      - PUID=1500
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.protocol=http
+      - traefik.port=80
+      - traefik.backend=nextcloud
+      - traefik.frontend.rule=Host:nextcloud.clfp.fr,cloud.clfp.fr,nuage.clfp.fr
+#      - traefik.frontend.headers.forceSTSHeader=true
+      - traefik.frontend.headers.STSSeconds=315360000
+      - traefik.frontend.headers.STSIncludeSubdomains=true
+      - traefik.frontend.headers.STSPreload=true
+    volumes:
+      - /mnt/DATA/DOCKER/03_nextcloud/nextcloud/config:/config
+      - /mnt/DATA/DOCKER/03_nextcloud/nextcloud/data:/data
+      - /mnt/DATA/USERS:/raid_storage/USERS
+      - /mnt/DATA/MEDIA:/raid_storage/MEDIA
+    depends_on:
+      - nextcloud_database
+    networks:
+      - traefik-net
+      - stack-net
+
+  nextcloud_database:
+    image: postgres
+    container_name: nextcloud_database
+    restart: always
+    expose:
+      - 5432
+    environment:
+      - POSTGRES_USER=nextcloud
+      - POSTGRES_DB=nextcloud
+    env_file: postgresql_secret.env
+    labels:
+      - traefik.enable=false
+    volumes:
+      - /mnt/DATA/DOCKER/03_nextcloud/postgresql:/var/lib/postgresql
+    networks:
+      - stack-net
