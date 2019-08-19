@@ -11,8 +11,8 @@ services:
     image: nginx:alpine
     container_name: nextcloud-nginx
     restart: always
-    expose:
-      - 80
+    ports:
+      - 8083:80
     environment:
       - TZ=Europe/Paris
     labels:
@@ -27,7 +27,7 @@ services:
       - traefik.frontend.headers.STSIncludeSubdomains=true
       - traefik.frontend.headers.STSPreload=true
     volumes:
-      - /mnt/DATA/DOCKER/03_nextcloud/nextcloud/:/var/www/html/:ro
+      - /mnt/DATA/DOCKER/03_nextcloud/nextcloud:/usr/share/nginx/html:ro
     depends_on:
       - nextcloud_database
       - nextcloud-fpm
@@ -39,15 +39,13 @@ services:
     image: nextcloud:fpm-alpine
     container_name: nextcloud-fpm
     restart: always
-    expose:
-      - 80
     environment:
       - TZ=Europe/Paris
     user: 1500:1500
     labels:
       - traefik.enable=false
     volumes:
-      - /mnt/DATA/DOCKER/03_nextcloud/nextcloud/:/var/www/html/
+      - /mnt/DATA/DOCKER/03_nextcloud/nextcloud:/var/www/html
       - /mnt/DATA/USERS:/raid_storage/USERS
       - /mnt/DATA/MEDIA:/raid_storage/MEDIA
     depends_on:
