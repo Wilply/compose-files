@@ -80,12 +80,13 @@ services:
     labels:
       - traefik.enable=false
     volumes:
-      - /mnt/DATA/DOCKER/03_nextcloud/postgresql:/var/lib/postgresql
+      - /mnt/DATA/DOCKER/03_nextcloud/postgresql:/var/lib/postgresql/data
     networks:
       - stack-net
 
   nextcloud-redis:
     image: redis:alpine
+    container_name: nextcloud-redis
     restart: always
     expose:
       - 6379
