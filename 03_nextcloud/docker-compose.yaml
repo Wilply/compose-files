@@ -44,6 +44,10 @@ services:
       - 9000
     environment:
       - TZ=Europe/Paris
+      - POSTGRES_HOST=db
+      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=postgres
+    env_file: postgresql_secret.env
     user: 1500:1500
     labels:
       - traefik.enable=false
@@ -63,8 +67,7 @@ services:
     expose:
       - 5432
     environment:
-      - POSTGRES_USER=nextcloud
-      - POSTGRES_DB=nextcloud
+      - POSTGRES_USER=postgres
     env_file: postgresql_secret.env
     labels:
       - traefik.enable=false
