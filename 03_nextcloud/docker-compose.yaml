@@ -1,5 +1,11 @@
 version: '3'
 
+# /!\ : on first install, nextcloud will display 504.
+# DO NOTHING, WAIT 3 MINUTES
+#THEN GO TO THE / PAGE
+#DO NOT RELOAD
+#nextcloud take some times to install itself
+
 networks:
   traefik-net:
     external: true
@@ -11,8 +17,7 @@ services:
     image: nginx:alpine
     container_name: nextcloud-nginx
     restart: always
-    expose:
-      - 80
+    expose:  80
     environment:
       - TZ=Europe/Paris
     labels:
@@ -40,38 +45,41 @@ services:
     image: nextcloud:fpm-alpine
     container_name: nextcloud-fpm
     restart: always
-    expose:
-      - 9000
+    expose: 9000
     environment:
       - TZ=Europe/Paris
       - POSTGRES_HOST=nextcloud-database
       - POSTGRES_DB=nextcloud
       - POSTGRES_USER=postgres
+      - REDIS_HOST=nextcloud-redis
     env_file: postgresql_secret.env
     user: 1500:1500
-    labels:
-      - traefik.enable=false
+    labels: traefik.enable=false
     volumes:
       - /mnt/DATA/DOCKER/03_nextcloud/nextcloud:/var/www/html
       - /mnt/DATA/USERS:/raid_storage/USERS
       - /mnt/DATA/MEDIA:/raid_storage/MEDIA
     depends_on:
       - nextcloud-database
-    networks:
-      - stack-net
+      - nextcloud-redis
+    networks: stack-net
 
   nextcloud-database:
     image: postgres:alpine
     container_name: nextcloud-database
     restart: always
-    expose:
-      - 5432
+    expose: 5432
     environment:
       - POSTGRES_USER=postgres
     env_file: postgresql_secret.env
-    labels:
-      - traefik.enable=false
+    labels: traefik.enable=false
     volumes:
       - /mnt/DATA/DOCKER/03_nextcloud/postgresql:/var/lib/postgresql
-    networks:
-      - stack-net
+    networks: stack-net
+
+  nextcloud-redis:
+    image: redis:alpine
+    restart: always
+    expose: 6379
+    labels: traefik.enable=false
+    networks: stack-net
