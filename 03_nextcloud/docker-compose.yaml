@@ -17,7 +17,8 @@ services:
     image: nginx:alpine
     container_name: nextcloud-nginx
     restart: always
-    expose:  80
+    expose:
+      - 80
     environment:
       - TZ=Europe/Paris
     labels:
@@ -45,7 +46,8 @@ services:
     image: nextcloud:fpm-alpine
     container_name: nextcloud-fpm
     restart: always
-    expose: 9000
+    expose:
+      - 9000
     environment:
       - TZ=Europe/Paris
       - POSTGRES_HOST=nextcloud-database
@@ -54,7 +56,8 @@ services:
       - REDIS_HOST=nextcloud-redis
     env_file: postgresql_secret.env
     user: 1500:1500
-    labels: traefik.enable=false
+    labels:
+      - traefik.enable=false
     volumes:
       - /mnt/DATA/DOCKER/03_nextcloud/nextcloud:/var/www/html
       - /mnt/DATA/USERS:/raid_storage/USERS
@@ -62,17 +65,20 @@ services:
     depends_on:
       - nextcloud-database
       - nextcloud-redis
-    networks: stack-net
+    networks:
+      - stack-net
 
   nextcloud-database:
     image: postgres:alpine
     container_name: nextcloud-database
     restart: always
-    expose: 5432
+    expose:
+      - 5432
     environment:
       - POSTGRES_USER=postgres
     env_file: postgresql_secret.env
-    labels: traefik.enable=false
+    labels:
+      - traefik.enable=false
     volumes:
       - /mnt/DATA/DOCKER/03_nextcloud/postgresql:/var/lib/postgresql
     networks: stack-net
@@ -80,6 +86,9 @@ services:
   nextcloud-redis:
     image: redis:alpine
     restart: always
-    expose: 6379
-    labels: traefik.enable=false
-    networks: stack-net
+    expose:
+      - 6379
+    labels:
+      - traefik.enable=false
+    networks:
+      - stack-net
