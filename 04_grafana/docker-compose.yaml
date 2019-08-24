@@ -1,0 +1,51 @@
+version: '3'
+
+networks:
+  traefik-net:
+    external: true
+  stack-net:
+    internal: true
+
+services:
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    restart: always
+    expose:
+      - 3000
+    environment:
+      - TZ=Europe/Paris
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.protocol=http
+      - traefik.port=3000
+      - traefik.backend=grafana
+      - traefik.frontend.rule=Host:grafana.clfp.fr
+#      - traefik.frontend.headers.forceSTSHeader=true
+      - traefik.frontend.headers.STSSeconds=315360000
+      - traefik.frontend.headers.STSIncludeSubdomains=true
+      - traefik.frontend.headers.STSPreload=true
+    volumes:
+      - /mnt/DATA/DOCKER/04_grafana/grafana:/var/lib/grafana
+    depends_on:
+      - grafana-influxdb
+    networks:
+      - traefik-net
+      - stack-net
+
+  grafana-influxdb:
+    image: influxdb
+    container_name: grafana-influxdb
+    restart: always
+    environment:
+      - TZ=Europe/Paris
+      - INFLUXDB_HTTP_UNIX_SOCKET_ENABLED=true
+      - INFLUXDB_HTTP_UNIX_BIND_SOCKET=/var/run/influxdb/influxdb.sock
+    labels:
+      - traefik.enable=false
+    volumes:
+      - /mnt/DATA/DOCKER/04_grafana/influxdb:/var/lib/influxdb
+      - /mnt/DATA/DOCKER/04_grafana/influxdb-socket:/var/run/influxdb
+    networks:
+      - stack-net
