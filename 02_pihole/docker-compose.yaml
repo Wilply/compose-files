@@ -1,27 +1,8 @@
-version: '2'
+version: '3'
 
 networks:
   traefik-net:
     external: true
-  lan-net:
-    external: true
-
-### CREATE THIS NETWORK IN EXTERNAL AND BIND IT TO HOST ###
-#docker network create -d macvlan --subnet=10.33.0.1/24 --gateway=10.33.0.1 --ip-range=10.33.0.4/30  -o parent=enp3s0 lan-net
-#  lan:
-#    driver: macvlan
-#    driver_opts:
-#      parent: enp3s0
-#    ipam:
-#      config:
-#        - subnet: 10.33.0.1/24
-#          gateway: 10.33.0.1
-#          ip_range: 10.33.0.4/32
-#
-### COMMANDS TO LINK IT TO HOST ###
-#sudo ip link add mac0 link enp3s0 type macvlan mode bridge
-#sudo ip addr add 10.33.0.6/30 dev mac0
-#sudo ip link set mac0 up
 
 services:
   pihole:
@@ -31,6 +12,7 @@ services:
     ports:
       - 53:53/tcp
       - 53:53/udp
+      - 67:67/udp
     expose:
       - 80
     environment:
@@ -60,5 +42,3 @@ services:
       - 9.9.9.9
     networks:
       traefik-net: null
-      lan-net:
-        ipv4_address: 10.33.0.5
