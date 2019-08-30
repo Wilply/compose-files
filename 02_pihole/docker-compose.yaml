@@ -3,6 +3,9 @@ version: '3'
 networks:
   traefik-net:
     external: true
+  stack-net:
+    internal: true
+#  lan-net:
 
 services:
   pihole:
@@ -12,7 +15,6 @@ services:
     ports:
       - 53:53/tcp
       - 53:53/udp
-      - 67:67/udp
     expose:
       - 80
     environment:
@@ -42,3 +44,12 @@ services:
       - 9.9.9.9
     networks:
       traefik-net: null
+      stack-net: null
+
+  dhcphelper:
+    build: ./dhcp-helper.dockerfile
+    restart: always
+    network_mode: "host"
+    command: -s pihole
+    cap_add:
+      - NET_ADMIN
