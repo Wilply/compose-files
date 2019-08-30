@@ -1,11 +1,19 @@
-version: '3'
+version: '2'
 
 networks:
   traefik-net:
     external: true
   stack-net:
     internal: true
-#  lan-net:
+  lan-net:
+    driver: macvlan
+    driver_opts:
+      parent: enp3s0
+    ipam:
+      config:
+        - subnet: 10.33.0.1/24
+          gateway: 10.33.0.1
+#          ip-range: 10.33.0.4/30
 
 services:
   pihole:
@@ -17,12 +25,15 @@ services:
       - 53:53/udp
     expose:
       - 80
+      - 67/tcp
+      - 67/udp
     environment:
       - TZ=Europe/Paris
       - VIRTUAL_HOST=pihole.clfp.fr
 #/!\ on local, access using host_ip:8082/admin/. add /admin/
       - DNS1=9.9.9.9
       - DNS2=1.1.1.1
+      - DNSMASQ_LISTENING=all
     env_file:
       - pihole-password.env
     labels:
@@ -46,10 +57,16 @@ services:
       traefik-net: null
       stack-net: null
 
-  dhcphelper:
-    build: ./dhcp-helper.dockerfile
+  dhcp-helper:
+    build: ./dhcp-helper
+    container_name: dhcp-helper
     restart: always
-    network_mode: "host"
     command: -s pihole
     cap_add:
       - NET_ADMIN
+    depends_on:
+      - pihole
+    networks:
+      stack-net: null
+      lan-net:
+        ipv4_address: 10.33.0.5
