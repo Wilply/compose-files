@@ -11,9 +11,9 @@ networks:
       parent: enp3s0
     ipam:
       config:
-        - subnet: 10.33.0.1/24
-          gateway: 10.33.0.1
-#          ip-range: 10.33.0.4/30
+        - subnet: 192.168.1.254/24
+          gateway: 192.168.1.254
+#          ip-range: 192.168.1.254/30
 
 services:
   pihole:
@@ -69,4 +69,4 @@ services:
     networks:
       stack-net: null
       lan-net:
-        ipv4_address: 10.33.0.5
+        ipv4_address: 192.168.1.5
