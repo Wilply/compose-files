@@ -1,0 +1,48 @@
+version: '3'
+
+networks:
+  traefik-net:
+    external: true
+  stack-net:
+    internal: true
+
+services:
+
+  wp:
+    image: wordpress
+    container_name: wordpress
+    restart: always
+    expose:
+      - 80
+      - 443
+    environment:
+      - WORDPRESS_DB_HOST=db
+      - WORDPRESS_DB_USER='admin'
+      - WORDPRESS_DB_PASSWORD='p@ssw0rd'
+      - WORDPRESS_DB_NAME='wordpress'
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.protocol=http
+      - traefik.port=80
+      - traefik.backend=traefik
+      - traefik.frontend.rule=Host:wplist.clfp.fr
+      - traefik.frontend.auth.basic="enzo:$$apr1$$UwwVAZHs$$ndp7E0d.hka.CMWN.BPsr1"
+    volumes:
+      - /mnt/DATA/DOCKER/99_wordpress/wordpress:/var/www/html
+    networks:
+      - traefik-net
+      - stack-net
+
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      - MYSQL_DATABASE='wordpress'
+      - MYSQL_USER='admin'
+      - MYSQL_PASSWORD='p@ssw0rd'
+      - MYSQL_ROOT_PASSWORD='rootp@ssw0rd'
+    volumes:
+      - /mnt/DATA/DOCKER/99_wordpress/db:/var/lib/mysql
+    networks:
+      - stack-net
