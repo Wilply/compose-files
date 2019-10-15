@@ -69,4 +69,4 @@ services:
     networks:
       stack-net: null
       lan-net:
-        ipv4_address: 192.168.1.5
+        ipv4_address: 192.168.1.105
