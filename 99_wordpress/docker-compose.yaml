@@ -8,7 +8,7 @@ networks:
 
 services:
 
-  wp:
+  wordpress:
     image: wordpress
     container_name: wordpress
     restart: always
@@ -30,13 +30,18 @@ services:
       - traefik.frontend.auth.basic="enzo:$$apr1$$UwwVAZHs$$ndp7E0d.hka.CMWN.BPsr1"
     volumes:
       - /mnt/DATA/DOCKER/99_wordpress/wordpress:/var/www/html
+    depends_on:
+      - wordpress_db
     networks:
       - traefik-net
       - stack-net
 
-  db:
+  wordpress_db:
     image: mariadb
+    container_name: wordpress_db
     restart: always
+    expose:
+      - 3306 
     environment:
       - MYSQL_DATABASE='wordpress'
       - MYSQL_USER='admin'
