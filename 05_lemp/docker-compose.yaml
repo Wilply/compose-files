@@ -37,7 +37,7 @@ services:
       - stack-net
 
   php:
-    image: php:rc-fpm-alpine
+    image: php:fpm-alpine
     container_name: lemp-php
     restart: always
     expose:
