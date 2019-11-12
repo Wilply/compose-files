@@ -1,0 +1,54 @@
+version: '3'
+
+networks:
+  traefik-net:
+    external: true
+  stack-net:
+    internal: true
+
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: lemp-nginx
+    restart: always
+    expose:
+      - 80
+    environment:
+      - TZ=Europe/Paris
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=traefik-net
+      - traefik.protocol=http
+      - traefik.port=80
+      - traefik.backend=nextcloud
+      - traefik.frontend.rule=Host:nextcloud.clfp.fr,cloud.clfp.fr,nuage.clfp.fr
+#      - traefik.frontend.headers.forceSTSHeader=true
+      - traefik.frontend.headers.STSSeconds=315360000
+      - traefik.frontend.headers.STSIncludeSubdomains=true
+      - traefik.frontend.headers.STSPreload=true
+    depends_on:
+      - database
+      - php
+    networks:
+      - traefik-net
+      - stack-net
+
+  php:
+    image: php:rc-fpm-alpine
+    container_name: lemp-fpm
+    restart: always
+    environment:
+      - TZ=Europe/Paris
+    labels:
+      - traefik.enable=false
+    networks:
+      - stack-net
+
+  database:
+    image: mysql:latest
+    container_name: lemp-database
+    restart: always
+    labels:
+      - traefik.enable=false
+    networks:
+      - stack-net
