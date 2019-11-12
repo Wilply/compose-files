@@ -20,8 +20,8 @@ services:
       - traefik.docker.network=traefik-net
       - traefik.protocol=http
       - traefik.port=80
-      - traefik.backend=nextcloud
-      - traefik.frontend.rule=Host:nextcloud.clfp.fr,cloud.clfp.fr,nuage.clfp.fr
+      - traefik.backend=lemp
+      - traefik.frontend.rule=Host:kraken.clfp.fr
 #      - traefik.frontend.headers.forceSTSHeader=true
       - traefik.frontend.headers.STSSeconds=315360000
       - traefik.frontend.headers.STSIncludeSubdomains=true
@@ -35,7 +35,7 @@ services:
 
   php:
     image: php:rc-fpm-alpine
-    container_name: lemp-fpm
+    container_name: lemp-php
     restart: always
     environment:
       - TZ=Europe/Paris
@@ -48,6 +48,9 @@ services:
     image: mysql:latest
     container_name: lemp-database
     restart: always
+    environment:
+      - TZ=Europe/Paris
+      - MYSQL_ROOT_PASSWORD=azerty123
     labels:
       - traefik.enable=false
     networks:
