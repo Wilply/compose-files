@@ -28,7 +28,7 @@ services:
       - traefik.frontend.headers.STSPreload=true
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./app:/usr/share/nginx/app:ro
+      - ./app:/var/www/html:ro
     depends_on:
       - database
       - php
@@ -46,6 +46,8 @@ services:
       - TZ=Europe/Paris
     labels:
       - traefik.enable=false
+    volumes:
+      - ./app:/var/www/html:ro
     networks:
       - stack-net
 
